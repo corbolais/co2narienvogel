@@ -2,6 +2,7 @@
 #include <Wire.h>
 #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
+#include <Servo.h>
 #ifdef ESP32
 #include <SparkFun_SCD30_Arduino_Library.h>
 #include <Tone32.h>
@@ -19,14 +20,15 @@
 #define LED_PIN 0
 #define LED_BRIGHTNESS 37
 
-// Buzzer, activated continuously when CO2 level is critical.
+// Buzzer.
 #define BUZZER_PIN 14
 #define BEEP_DURATION_MS 100
 #define BEEP_TONE 1047 // C6
 
-// Switch, is pulled HIGH once for SWITCH_DURATION_MS when CO2 level becomes critical.
-#define SWITCH_PIN 12
-#define SWITCH_DURATION_MS 200
+// Servo.
+#define SERVO_PIN 12
+#define SERVO_POS_UP 0
+#define SERVO_POS_DN 180
 
 // BME280 pressure sensor (optional).
 // Address should be 0x76 or 0x77.
@@ -42,6 +44,7 @@
 SCD30 scd30;
 Adafruit_NeoPixel led = Adafruit_NeoPixel(1, LED_PIN, NEO_GRB + NEO_KHZ800);
 Adafruit_BME280 bme280;
+Servo servo;
 bool bme280isConnected = false;
 sensors_event_t pressureEvent;
 uint16_t co2 = 0;
@@ -53,9 +56,15 @@ bool alarmHasTriggered = false;
  * Triggered once when the CO2 level goes critical.
  */
 void alarmOnce() {
-  digitalWrite(SWITCH_PIN, HIGH);
-  delay(SWITCH_DURATION_MS);
-  digitalWrite(SWITCH_PIN, LOW);
+  servo.write(SERVO_POS_DN);
+}
+
+
+/**
+ * Triggered once when the CO2 level becomes yellow again.
+ */
+void alarmOnceDone() {
+  servo.write(SERVO_POS_UP);
 }
 
 
@@ -73,7 +82,11 @@ void setup() {
 
   // Initialize pins.
   pinMode(BUZZER_PIN, OUTPUT);
-  pinMode(SWITCH_PIN, OUTPUT);
+  pinMode(SERVO_PIN, OUTPUT);
+
+  // Initialize servo.
+  servo.attach(SERVO_PIN);
+  servo.write(SERVO_POS_UP);
 
   // Initialize LED.
   led.begin();
