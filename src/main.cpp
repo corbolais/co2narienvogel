@@ -95,7 +95,7 @@ void alarmContinuous() {
 
 
 void singHighChirp(int intensity, int chirpsNumber) {
-  for (int veces = 0; veces <= chirpsNumber; veces++) {
+  for (int times = 0; times <= chirpsNumber; times++) {
     for (int i = 100; i > 0; i--) {
       for (int x = 0; x < intensity; x++) {
         digitalWrite(BUZZER_PIN, HIGH);
@@ -108,7 +108,7 @@ void singHighChirp(int intensity, int chirpsNumber) {
 }
 
 void singLowChirp(int intensity, int chirpsNumber) {
-  for (int veces = 0; veces <= chirpsNumber; veces++) {
+  for (int times = 0; times <= chirpsNumber; times++) {
     for (int i = 0; i < 200; i++) {
       digitalWrite(BUZZER_PIN, HIGH);
       delayMicroseconds(i);
@@ -128,7 +128,7 @@ void singLowChirp(int intensity, int chirpsNumber) {
 
 void singTweet(int intensity, int chirpsNumber) {
   // Normal chirpsNumber 3, normal intensity 5
-  for (int veces = 0; veces < chirpsNumber; veces++) {
+  for (int times = 0; times < chirpsNumber; times++) {
     for (int i = 80; i > 0; i--) {
       for (int x = 0; x < intensity; x++) {
         digitalWrite(BUZZER_PIN, HIGH);
