@@ -52,23 +52,45 @@ bool bme280isConnected = false;
 uint16_t co2 = 0;
 uint16_t pressure = 0;
 bool alarmHasTriggered = false;
-int sAngle, sCounter = 0;
+int sAngulo, sCounter = 0;
 unsigned long nextSingTime, now = 0;
 
 
-void birdUp() {
+/**
+ * Moves the servo to given position.
+ *
+ * @param position degrees
+ * @param moveTime ms
+ */
+void moveServo(int position, uint moveTime = SERVO_MOVE_TIME_MS) {
   servo.attach(SERVO_PIN);
-  servo.write(SERVO_POS_UP);
-  delay(SERVO_MOVE_TIME_MS);
+  servo.write(position);
+  delay(moveTime);
   servo.detach();
 }
 
 
-void birdDown() {
-  servo.attach(SERVO_PIN);
-  servo.write(SERVO_POS_DN);
-  delay(SERVO_MOVE_TIME_MS);
-  servo.detach();
+/**
+ * Triggered once when the CO2 level goes critical.
+ */
+void alarmOnce() {
+  moveServo(SERVO_POS_DN);
+}
+
+
+/**
+ * Triggered once when the CO2 level becomes yellow again.
+ */
+void alarmOnceDone() {
+  moveServo(SERVO_POS_UP);
+}
+
+
+/**
+ * Triggered continuously when the CO2 level is critical.
+ */
+void alarmContinuous() {
+
 }
 
 
@@ -126,13 +148,13 @@ void singTweet(int intensity, int chirpsNumber) {
  */
 void sing() {
   for (int i = random(1, 3); i > 0; i--) {
-    sAngle = random(20, 50);
+    sAngulo = random(20, 50);
     sCounter = random(2, 6);
 
     // Makes the sound according to: intensity, varies: normally 5. number of times: how many times tweets, normally 3-6.
-    singHighChirp(5, sAngle / 10);
+    singHighChirp(5, sAngulo / 10);
     delay(random(80, 120));
-    singLowChirp(sAngle * 4, 2);
+    singLowChirp(sAngulo * 4, 2);
     delay(random(80, 120));
     singTweet(sCounter, 2);
 
@@ -150,7 +172,7 @@ void setup() {
   pinMode(SERVO_PIN, OUTPUT);
 
   // Initialize servo.
-  birdUp();
+  moveServo(SERVO_POS_UP);
 
   // Initialize LED.
   led.begin();
@@ -212,13 +234,14 @@ void loop() {
 
   // Trigger alarms.
   if (co2 >= 2000) {
+    alarmContinuous();
     if (!alarmHasTriggered) {
-      birdDown();
+      alarmOnce();
       alarmHasTriggered = true;
     }
   }
   else if (alarmHasTriggered) {
-    birdUp();
+    alarmOnceDone();
     alarmHasTriggered = false;
   }
 
