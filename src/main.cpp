@@ -52,7 +52,7 @@ bool bme280isConnected = false;
 uint16_t co2 = 0;
 uint16_t pressure = 0;
 bool alarmHasTriggered = false;
-int sAngulo, sCounter = 0;
+int sAngle, sCounter = 0;
 unsigned long nextSingTime, now = 0;
 
 
@@ -148,13 +148,13 @@ void singTweet(int intensity, int chirpsNumber) {
  */
 void sing() {
   for (int i = random(1, 3); i > 0; i--) {
-    sAngulo = random(20, 50);
+    sAngle = random(20, 50);
     sCounter = random(2, 6);
 
     // Makes the sound according to: intensity, varies: normally 5. number of times: how many times tweets, normally 3-6.
-    singHighChirp(5, sAngulo / 10);
+    singHighChirp(5, sAngle / 10);
     delay(random(80, 120));
-    singLowChirp(sAngulo * 4, 2);
+    singLowChirp(sAngle * 4, 2);
     delay(random(80, 120));
     singTweet(sCounter, 2);
 
