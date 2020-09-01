@@ -3,11 +3,14 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
 #include <Servo.h>
+
 #ifdef ESP32
 #include <SparkFun_SCD30_Arduino_Library.h>
 #include <Tone32.h>
 #else
+
 #include <paulvha_SCD30.h>
+
 #endif
 
 
@@ -22,8 +25,7 @@
 
 // Buzzer.
 #define BUZZER_PIN 14
-#define BEEP_DURATION_MS 100
-#define BEEP_TONE 1047 // C6
+#define SING_INTERVAL_S 10 // Mean sing interval (randomized).
 
 // Servo.
 #define SERVO_PIN 12
@@ -50,6 +52,8 @@ sensors_event_t pressureEvent;
 uint16_t co2 = 0;
 uint16_t pressure = 0;
 bool alarmHasTriggered = false;
+int sAngulo, sCounter = 0;
+unsigned long nextSingTime, now = 0;
 
 
 /**
@@ -72,8 +76,77 @@ void alarmOnceDone() {
  * Triggered continuously when the CO2 level is critical.
  */
 void alarmContinuous() {
-  tone(BUZZER_PIN, BEEP_TONE, BEEP_DURATION_MS);
-  digitalWrite(LED_PIN, LOW);
+
+}
+
+
+void singHighChirp(int intensity, int chirpsNumber) {
+  for (int veces = 0; veces <= chirpsNumber; veces++) {
+    for (int i = 100; i > 0; i--) {
+      for (int x = 0; x < intensity; x++) {
+        digitalWrite(BUZZER_PIN, HIGH);
+        delayMicroseconds(i);
+        digitalWrite(BUZZER_PIN, LOW);
+        delayMicroseconds(i);
+      }
+    }
+  }
+}
+
+void singLowChirp(int intensity, int chirpsNumber) {
+  for (int veces = 0; veces <= chirpsNumber; veces++) {
+    for (int i = 0; i < 200; i++) {
+      digitalWrite(BUZZER_PIN, HIGH);
+      delayMicroseconds(i);
+      digitalWrite(BUZZER_PIN, LOW);
+      delayMicroseconds(i);
+    }
+    for (int i = 90; i > 80; i--) {
+      for (int x = 0; x < 5; x++) {
+        digitalWrite(BUZZER_PIN, HIGH);
+        delayMicroseconds(i);
+        digitalWrite(BUZZER_PIN, LOW);
+        delayMicroseconds(i);
+      }
+    }
+  }
+}
+
+void singTweet(int intensity, int chirpsNumber) {
+  // Normal chirpsNumber 3, normal intensity 5
+  for (int veces = 0; veces < chirpsNumber; veces++) {
+    for (int i = 80; i > 0; i--) {
+      for (int x = 0; x < intensity; x++) {
+        digitalWrite(BUZZER_PIN, HIGH);
+        delayMicroseconds(i);
+        digitalWrite(BUZZER_PIN, LOW);
+        delayMicroseconds(i);
+      }
+    }
+  }
+
+  delay(random(800, 1200));
+}
+
+
+/**
+ * Play bird sounds.
+ */
+void sing() {
+  for (int i = random(1, 3); i > 0; i--) {
+    sAngulo = random(20, 50);
+    sCounter = random(2, 6);
+
+    // Makes the sound according to: intensity, varies: normally 5. number of times: how many times tweets, normally 3-6.
+    singHighChirp(5, sAngulo / 10);
+    delay(random(80, 120));
+    singLowChirp(sAngulo * 4, 2);
+    delay(random(80, 120));
+    singTweet(sCounter, 2);
+
+    // Delay between the closer tweets.
+    delay(random(200, 700));
+  }
 }
 
 
@@ -157,6 +230,13 @@ void loop() {
   else if (alarmHasTriggered) {
     alarmOnceDone();
     alarmHasTriggered = false;
+  }
+
+  // Play sounds.
+  now = millis();
+  if (co2 < 2000 && nextSingTime < now) {
+    sing();
+    nextSingTime = now + (random(SING_INTERVAL_S /2, SING_INTERVAL_S * 1.5) * 1000);
   }
 
   delay(MEASURE_INTERVAL_S * 1000);
