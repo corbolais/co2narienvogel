@@ -154,7 +154,8 @@ void loop() {
       alarmHasTriggered = true;
     }
   }
-  if (co2 < 2000 && alarmHasTriggered) {
+  else if (alarmHasTriggered) {
+    alarmOnceDone();
     alarmHasTriggered = false;
   }
 
