@@ -31,6 +31,7 @@
 #define SERVO_PIN 12
 #define SERVO_POS_UP 0
 #define SERVO_POS_DN 180
+#define SERVO_MOVE_TIME_MS 500 // Servo will be switched off after this time.
 
 // BME280 pressure sensor (optional).
 // Address should be 0x76 or 0x77.
@@ -56,27 +57,19 @@ int sAngulo, sCounter = 0;
 unsigned long nextSingTime, now = 0;
 
 
-/**
- * Triggered once when the CO2 level goes critical.
- */
-void alarmOnce() {
-  servo.write(SERVO_POS_DN);
-}
-
-
-/**
- * Triggered once when the CO2 level becomes yellow again.
- */
-void alarmOnceDone() {
+void birdUp() {
+  servo.attach(SERVO_PIN);
   servo.write(SERVO_POS_UP);
+  delay(SERVO_MOVE_TIME_MS);
+  servo.detach();
 }
 
 
-/**
- * Triggered continuously when the CO2 level is critical.
- */
-void alarmContinuous() {
-
+void birdDown() {
+  servo.attach(SERVO_PIN);
+  servo.write(SERVO_POS_DN);
+  delay(SERVO_MOVE_TIME_MS);
+  servo.detach();
 }
 
 
@@ -158,8 +151,7 @@ void setup() {
   pinMode(SERVO_PIN, OUTPUT);
 
   // Initialize servo.
-  servo.attach(SERVO_PIN);
-  servo.write(SERVO_POS_UP);
+  birdAlive();
 
   // Initialize LED.
   led.begin();
@@ -221,14 +213,13 @@ void loop() {
 
   // Trigger alarms.
   if (co2 >= 2000) {
-    alarmContinuous();
     if (!alarmHasTriggered) {
-      alarmOnce();
+      birdDown();
       alarmHasTriggered = true;
     }
   }
   else if (alarmHasTriggered) {
-    alarmOnceDone();
+    birdUp();
     alarmHasTriggered = false;
   }
 
