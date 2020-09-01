@@ -151,7 +151,7 @@ void setup() {
   pinMode(SERVO_PIN, OUTPUT);
 
   // Initialize servo.
-  birdAlive();
+  birdUp();
 
   // Initialize LED.
   led.begin();
