@@ -35,8 +35,16 @@ Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-
 | GPIO 14 / D5 | Buzzer (+)                                            |
 | GPIO 12 / D6 | Servo PWM (often brown)                               |
 
-### Flash using the Arduino IDE
-- Rename `src/main.cpp` to `co2narienvogel.ino` and place it in a folder named `co2narienvogel`.
+### Flashing the ESP using the [Arduino IDE](https://www.arduino.cc/en/Main/Software)
+- [Download](https://github.com/netzbasteln/co2narienvogel/archive/master.zip) the latest code and unzip it.
 - Open `co2narienvogel.ino` in the Arduino IDE.
-- Install all libraries mentioned in `platformio.ini` (the `lib_deps` section) using the library manager.
-- Upload (hope it works).
+- Install the following libraries using the Arduino library manager:
+  - `Adafruit BME280 Library`
+  - `Adafruit NeoPixel`
+  - *ESP8266 only:*
+    - [paulvha/scd30](https://github.com/paulvha/scd30) *
+  - *ESP32 only:*
+    - `SparkFun SCD30 Arduino Library`
+    - [lbernstone/Tone32](https://github.com/lbernstone/Tone32) *
+  - \* not available in the built-in library manager, [here](https://www.baldengineer.com/installing-arduino-library-from-github.html) is a guide on how to install libraries directly from GitHub.
+- Build & upload!
