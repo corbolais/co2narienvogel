@@ -273,7 +273,7 @@ void loop() {
 
   // Play sounds.
   now = millis();
-  if (co2 < 2000 && nextSingTime < now) {
+  if (co2 < 1000 && nextSingTime < now) {
     sing();
     nextSingTime = now + (random(SING_INTERVAL_S / 2, SING_INTERVAL_S * 1.5) * 1000);
   }
