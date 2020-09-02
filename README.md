@@ -13,8 +13,8 @@ Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-
 
 
 ## Material
-1. Any ESP32 or ESP8266 board (like a WEMOS D32 or WEMOS D1 Mini).
-1. ([Sensirion SCD30](https://www.sensirion.com/de/umweltsensoren/kohlendioxidsensor/kohlendioxidsensoren-co2/)) carbon dioxide sensor module.
+1. WEMOS D1 Mini or other ESP8266 board. For ESP32 support check [coro2sense](https://github.com/kmetz/coro2sens)
+1. [Sensirion SCD30](https://www.sensirion.com/de/umweltsensoren/kohlendioxidsensor/kohlendioxidsensoren-co2/) carbon dioxide sensor module.
 1. 1 NeoPixel compatible RGB LED (WS2812B). 
 1. Optional: BME280 I<sup>2</sup>C pressure sensor module, improves accuracy.   
 1. 3V piezo buzzer or simple speaker.
