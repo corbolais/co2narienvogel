@@ -35,16 +35,10 @@ Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-
 | GPIO 14 / D5 | Buzzer (+)                                            |
 | GPIO 12 / D6 | Servo PWM (often brown)                               |
 
-### Flashing the ESP using the [Arduino IDE](https://www.arduino.cc/en/Main/Software)
-- [Download](https://github.com/netzbasteln/co2narienvogel/archive/master.zip) the latest code and unzip it.
-- Open `co2narienvogel.ino` in the Arduino IDE.
-- Install the following libraries using the Arduino library manager:
-  - `Adafruit BME280 Library`
-  - `Adafruit NeoPixel`
-  - *ESP8266 only:*
-    - [paulvha/scd30](https://github.com/paulvha/scd30) *
-  - *ESP32 only:*
-    - `SparkFun SCD30 Arduino Library`
-    - [lbernstone/Tone32](https://github.com/lbernstone/Tone32) *
-  - \* not available in the built-in library manager, [here](https://www.baldengineer.com/installing-arduino-library-from-github.html) is a guide on how to install libraries directly from GitHub.
-- Build & upload!
+### Flash using the Arduino IDE
+- Open `co2narienvogel.ino` in the Arduino IDE and make sure you can connect to your device  Wemos D1 mini clones often use the CH340 driver)
+- Install [ESP8266 support](https://www.heise.de/ct/artikel/Arduino-IDE-installieren-und-fit-machen-fuer-ESP8266-und-ESP32-4130814.html) 
+And libraries: 
+- [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280_Library)
+- [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
+- [Paulvha_SCD30](https://github.com/paulvha/scd30)
