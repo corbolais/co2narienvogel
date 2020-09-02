@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_NeoPixel.h>
-#include <SparkFunBME280.h>
 #include <Servo.h>
+#include <SparkFunBME280.h>
 #include <paulvha_SCD30.h>
 
 
@@ -12,17 +12,17 @@
 // - Green: all good (CO2 level < 1000 ppm).
 // - Yellow: warning, open windows (> 1000 ppm).
 // - Red: critical, leave room (> 2000 ppm).
-#define LED_PIN 0
-#define LED_BRIGHTNESS 37
+#define LED_PIN D3
+#define LED_BRIGHTNESS 255
 
 // Buzzer.
-#define BUZZER_PIN 14
+#define BUZZER_PIN D5
 #define SING_INTERVAL_S 10 // Mean sing interval (randomized).
 
 // Servo.
-#define SERVO_PIN 12
+#define SERVO_PIN D6
 #define SERVO_POS_UP 0
-#define SERVO_POS_DN 180
+#define SERVO_POS_DN 60
 #define SERVO_MOVE_TIME_MS 500 // Servo will be switched off after this time.
 
 // BME280 pressure sensor (optional).
