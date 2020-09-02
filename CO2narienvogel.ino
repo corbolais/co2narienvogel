@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
-#include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
+#include <SparkFunBME280.h>
 #include <Servo.h>
 #include <paulvha_SCD30.h>
 
@@ -38,7 +38,7 @@
 
 SCD30 scd30;
 Adafruit_NeoPixel led = Adafruit_NeoPixel(1, LED_PIN, NEO_GRB + NEO_KHZ800);
-Adafruit_BME280 bme280;
+BME280 bme280;
 Servo servo;
 bool bme280isConnected = false;
 uint16_t co2 = 0;
@@ -185,14 +185,17 @@ void setup() {
   scd30.setMeasurementInterval(MEASURE_INTERVAL_S);
 
   // Initialize BME280 sensor.
-  if (bme280.begin(BME280_I2C_ADDRESS, &Wire)) {
+  bme280.setI2CAddress(BME280_I2C_ADDRESS);
+  if (bme280.beginI2C(Wire)) {
     Serial.println("BMP280 pressure sensor detected.");
     bme280isConnected = true;
-    bme280.setSampling(Adafruit_BME280::MODE_FORCED,
-                       Adafruit_BME280::SAMPLING_X1, // Temperature.
-                       Adafruit_BME280::SAMPLING_X16, // Pressure.
-                       Adafruit_BME280::SAMPLING_X1, // Humidity.
-                       Adafruit_BME280::FILTER_X16);
+    // Settings.
+    bme280.setFilter(4);
+    bme280.setStandbyTime(0);
+    bme280.setTempOverSample(1);
+    bme280.setPressureOverSample(16);
+    bme280.setHumidityOverSample(1);
+    bme280.setMode(MODE_NORMAL);
   }
   else {
     Serial.println("BMP280 pressure sensor not detected. Continuing without ambient pressure compensation.");
@@ -203,8 +206,7 @@ void setup() {
 void loop() {
   // Read sensors.
   if (bme280isConnected) {
-    bme280.takeForcedMeasurement();
-    pressure = (uint16_t) (bme280.readPressure() / 100);
+    pressure = (uint16_t) (bme280.readFloatPressure() / 100);
     scd30.setAmbientPressure(pressure);
   }
   if (scd30.dataAvailable()) {
