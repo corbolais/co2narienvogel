@@ -141,7 +141,6 @@ void sing() {
   int seq;
   moveServo(SERVO_POS_SING, 100);
   for (int i = random(2, 6); i > 0; i--) {
-    delay(random(80, 120));
     seq = random(0, 2);
     if (seq == 0) {
       Serial.println("h");
@@ -151,6 +150,7 @@ void sing() {
       Serial.println("l");
       singLowChirp(random(20, 50) * 4, 2);
     }
+    delay(random(80, 120));
   }
   if (seq == 1 && random(0, 4) >= 1) {
     Serial.println("t");
