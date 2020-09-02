@@ -66,7 +66,7 @@ void moveServo(int position, uint moveTime = SERVO_MOVE_TIME_MS) {
  */
 void alarmOnce() {
   moveServo(SERVO_POS_DN);
-  alarmSound(5);
+  siren(5);
 }
 
 
@@ -130,8 +130,6 @@ void singTweet(int intensity, int chirpsNumber) {
       }
     }
   }
-
-  delay(random(800, 1200));
 }
 
 
@@ -139,24 +137,27 @@ void singTweet(int intensity, int chirpsNumber) {
  * Play bird sounds.
  */
 void sing() {
+  int seq;
   for (int i = random(2, 6); i > 0; i--) {
-    int seq = random(0, 2);
+    seq = random(0, 2);
     if (seq == 0) {
       singHighChirp(5, random(20, 50) / 10);
     }
     if (seq == 1) {
       singLowChirp(random(20, 50) * 4, 2);
     }
-
-    if (seq == 2) {
-      singTweet(random(2, 6), 2);
-    }
     delay(random(80, 120));
+  }
+  if (seq == 1 && random(0, 3) >= 1) {
+    singTweet(random(2, 6), random(1, 3));
   }
 }
 
 
-void alarmSound(uint times) {
+/**
+ * Play a siren sound.
+ */
+void siren(uint times) {
   for (int i = 0; i < times; i++) {
     // Whoop up
     for (int hz = 440; hz < 1000; hz += 25) {
@@ -247,7 +248,7 @@ void loop() {
     led.setPixelColor(0, 0, 255, 0); // Green.
   }
   else if (co2 < 2000) {
-    led.setPixelColor(0, 255, 255, 0); // Yellow.
+    led.setPixelColor(0, 255, 200, 0); // Yellow.
   }
   else {
     led.setPixelColor(0, 255, 0, 0); // Red.
