@@ -9,7 +9,7 @@ The project of the Netzbasteln radio-show #148 is a canary bird that measures CO
 | Yellow ("open windows")   | 1000 – 2000 ppm             |
 | Red ("leave room")        | \> 2000 ppm                 |
 
-Based on [coro2sens](https://github.com/kmetz/coro2sens)[ideas from Umwelt-Campus Birkenfeld] and (https://www.umwelt-campus.de/forschung/projekte/iot-werkstatt/ideen-zur-corona-krise), which are based on 2008 [research by the German Federal Environmental Agency](https://www.umweltbundesamt.de/sites/default/files/medien/pdfs/kohlendioxid_2008.pdf).
+Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-Campus Birkenfeld](https://www.umwelt-campus.de/forschung/projekte/iot-werkstatt/ideen-zur-corona-krise), which are based on 2008 [research by the German Federal Environmental Agency](https://www.umweltbundesamt.de/sites/default/files/medien/pdfs/kohlendioxid_2008.pdf).
 
 
 ## Material
