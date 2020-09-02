@@ -1,7 +1,6 @@
 # CO<sub>2</sub>narienvogel
 
-Measures CO<sub>2</sub> concentration in room air and warns if levels become critical for Covid-19 infection risk.
-
+The project of the Netzbasteln radio-show #148 is a canary bird that measures CO<sub>2</sub> concentration in room air and warns if levels become critical for Covid-19 infection risk. Just like a canary bird warned miners when "[Evil Weather](https://de.wikipedia.org/wiki/B%C3%B6se_Wetter)" occured.
 
 ## Threshold values
 | LED color                 |CO<sub>2</sub> concentration |
@@ -10,16 +9,16 @@ Measures CO<sub>2</sub> concentration in room air and warns if levels become cri
 | Yellow ("open windows")   | 1000 – 2000 ppm             |
 | Red ("leave room")        | \> 2000 ppm                 |
 
-Based on [ideas from Umwelt-Campus Birkenfeld](https://www.umwelt-campus.de/forschung/projekte/iot-werkstatt/ideen-zur-corona-krise), which are based on 2008 [research by the German Federal Environmental Agency](https://www.umweltbundesamt.de/sites/default/files/medien/pdfs/kohlendioxid_2008.pdf).
+Based on [coro2sens](https://github.com/kmetz/coro2sens)[ideas from Umwelt-Campus Birkenfeld] and (https://www.umwelt-campus.de/forschung/projekte/iot-werkstatt/ideen-zur-corona-krise), which are based on 2008 [research by the German Federal Environmental Agency](https://www.umweltbundesamt.de/sites/default/files/medien/pdfs/kohlendioxid_2008.pdf).
 
 
-## You need
+## Material
 1. Any ESP32 or ESP8266 board (like a WEMOS D32 or WEMOS D1 Mini).
 1. Sensirion SCD30 carbon dioxide sensor module ([mouser.com](https://mouser.com/ProductDetail/Sensirion/SCD30?qs=rrS6PyfT74fdywu4FxpYjQ==)).
 1. 1 NeoPixel compatible RGB LED (WS2812B). 
 1. Optional: BME280 I<sup>2</sup>C pressure sensor module, improves accuracy.   
 1. 3V piezo buzzer or simple speaker.
-1. 5V servo motor.
+1. SG90 5V servo motor.
 1. A bird :)
 
 
