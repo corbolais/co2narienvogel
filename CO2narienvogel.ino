@@ -44,7 +44,6 @@ bool bme280isConnected = false;
 uint16_t co2 = 0;
 uint16_t pressure = 0;
 bool alarmHasTriggered = false;
-int sAngle, sCounter = 0;
 unsigned long nextSingTime, now = 0;
 
 
@@ -67,6 +66,7 @@ void moveServo(int position, uint moveTime = SERVO_MOVE_TIME_MS) {
  */
 void alarmOnce() {
   moveServo(SERVO_POS_DN);
+  alarmSound(5);
 }
 
 
@@ -139,21 +139,36 @@ void singTweet(int intensity, int chirpsNumber) {
  * Play bird sounds.
  */
 void sing() {
-  for (int i = random(1, 3); i > 0; i--) {
-    sAngle = random(20, 50);
-    sCounter = random(2, 6);
-
-    // Makes the sound according to: intensity, varies: normally 5. number of times: how many times tweets, normally 3-6.
-    singHighChirp(5, sAngle / 10);
-    delay(random(80, 120));
-    singTweet(sCounter, 2);
-    delay(random(80, 120));
-    singLowChirp(sAngle * 4, 2);
-   
-
-    // Delay between the closer tweets.
-    delay(random(200, 700));
+  for (int i = random(2, 6); i > 0; i--) {
+      int seq = random(0, 2);
+    if (seq == 0) {
+      singHighChirp(5, random(20, 50) / 10);
+    }
+    if (seq == 1) {
+      singLowChirp(random(20, 50) * 4, 2);
+    }
+    
+    if (seq == 2) {
+      singTweet(random(2, 6), 2);
+    }
+    delay(random(80, 120));    
   }
+}
+
+
+void alarmSound(uint times) { 
+  for (int i=0; i<times; i++) {
+  // Whoop up
+  for(int hz = 440; hz < 1000; hz+=25){
+    tone(BUZZER_PIN, hz, 50);
+    delay(5);
+  }
+  // Whoop down
+  for(int hz = 1000; hz > 440; hz-=25){
+    tone(BUZZER_PIN, hz, 50);
+    delay(5);
+  }
+ }
 }
 
 
@@ -164,9 +179,6 @@ void setup() {
   // Initialize pins.
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(SERVO_PIN, OUTPUT);
-
-  // Initialize servo.
-  moveServo(SERVO_POS_UP);
 
   // Initialize LED.
   led.begin();
@@ -201,6 +213,9 @@ void setup() {
   else {
     Serial.println("BMP280 pressure sensor not detected. Continuing without ambient pressure compensation.");
   }
+
+  // Initialize servo.
+  moveServo(SERVO_POS_UP);
 }
 
 
