@@ -19,7 +19,7 @@ Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-
 1. Optional: BME280 I<sup>2</sup>C pressure sensor module, improves accuracy.   
 1. 3V piezo buzzer or simple speaker.
 1. SG90 5V servo motor.
-1. A bird :)
+1. A bird :) 
 
 
 ### Wiring
@@ -37,8 +37,8 @@ Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-
 
 ### Flash using the Arduino IDE
 - Open `co2narienvogel.ino` in the Arduino IDE and make sure you can connect to your device  Wemos D1 mini clones often use the CH340 driver)
-- Install [ESP8266 support](https://www.heise.de/ct/artikel/Arduino-IDE-installieren-und-fit-machen-fuer-ESP8266-und-ESP32-4130814.html) 
-And libraries: 
+- Install newest [ESP8266 support](https://www.heise.de/ct/artikel/Arduino-IDE-installieren-und-fit-machen-fuer-ESP8266-und-ESP32-4130814.html) 
+And newest libraries: 
 - [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280_Library)
 - [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
-- [Paulvha_SCD30](https://github.com/paulvha/scd30)
+- [Paulvha_SCD30](https://github.com/paulvha/scd30) (Install via ZIP-Download on Github and Sketch -> Include library -> Add .ZIP) 
