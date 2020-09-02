@@ -144,14 +144,17 @@ void sing() {
     delay(random(80, 120));
     seq = random(0, 2);
     if (seq == 0) {
+      Serial.println("h");
       singHighChirp(5, random(20, 50) / 10);
     }
     if (seq == 1) {
+      Serial.println("l");
       singLowChirp(random(20, 50) * 4, 2);
     }
   }
-  if (seq == 1 && random(0, 3) >= 1) {
-    singTweet(random(2, 6), random(1, 3));
+  if (seq == 1 && random(0, 4) >= 1) {
+    Serial.println("t");
+    singTweet(random(2, 6), 3);
   }
   moveServo(SERVO_POS_UP, 100);
 }
