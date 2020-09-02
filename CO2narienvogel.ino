@@ -146,9 +146,10 @@ void sing() {
     // Makes the sound according to: intensity, varies: normally 5. number of times: how many times tweets, normally 3-6.
     singHighChirp(5, sAngle / 10);
     delay(random(80, 120));
-    singLowChirp(sAngle * 4, 2);
-    delay(random(80, 120));
     singTweet(sCounter, 2);
+    delay(random(80, 120));
+    singLowChirp(sAngle * 4, 2);
+   
 
     // Delay between the closer tweets.
     delay(random(200, 700));
