@@ -158,7 +158,8 @@ void sing() {
 
 void setup() {
   Serial.begin(115200);
-
+  Serial.println("----------------------------");
+  Serial.println("Say hello to Co2narienvogel!");
   // Initialize pins.
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(SERVO_PIN, OUTPUT);
@@ -194,7 +195,7 @@ void setup() {
                        Adafruit_BME280::FILTER_X16);
   }
   else {
-    Serial.println("BMP280 pressure sensor not detected. Please check wiring. Continuing without ambient pressure compensation.");
+    Serial.println("BMP280 pressure sensor not detected. Continuing without ambient pressure compensation.");
   }
 }
 
