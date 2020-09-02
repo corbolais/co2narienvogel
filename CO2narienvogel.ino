@@ -140,35 +140,35 @@ void singTweet(int intensity, int chirpsNumber) {
  */
 void sing() {
   for (int i = random(2, 6); i > 0; i--) {
-      int seq = random(0, 2);
+    int seq = random(0, 2);
     if (seq == 0) {
       singHighChirp(5, random(20, 50) / 10);
     }
     if (seq == 1) {
       singLowChirp(random(20, 50) * 4, 2);
     }
-    
+
     if (seq == 2) {
       singTweet(random(2, 6), 2);
     }
-    delay(random(80, 120));    
+    delay(random(80, 120));
   }
 }
 
 
-void alarmSound(uint times) { 
-  for (int i=0; i<times; i++) {
-  // Whoop up
-  for(int hz = 440; hz < 1000; hz+=25){
-    tone(BUZZER_PIN, hz, 50);
-    delay(5);
+void alarmSound(uint times) {
+  for (int i = 0; i < times; i++) {
+    // Whoop up
+    for (int hz = 440; hz < 1000; hz += 25) {
+      tone(BUZZER_PIN, hz, 50);
+      delay(5);
+    }
+    // Whoop down
+    for (int hz = 1000; hz > 440; hz -= 25) {
+      tone(BUZZER_PIN, hz, 50);
+      delay(5);
+    }
   }
-  // Whoop down
-  for(int hz = 1000; hz > 440; hz-=25){
-    tone(BUZZER_PIN, hz, 50);
-    delay(5);
-  }
- }
 }
 
 
@@ -222,7 +222,7 @@ void setup() {
 void loop() {
   // Read sensors.
   if (bme280isConnected) {
-    pressure = (uint16_t) (bme280.readFloatPressure() / 100);
+    pressure = (uint16_t)(bme280.readFloatPressure() / 100);
     scd30.setAmbientPressure(pressure);
   }
   if (scd30.dataAvailable()) {
@@ -260,7 +260,7 @@ void loop() {
   now = millis();
   if (co2 < 2000 && nextSingTime < now) {
     sing();
-    nextSingTime = now + (random(SING_INTERVAL_S /2, SING_INTERVAL_S * 1.5) * 1000);
+    nextSingTime = now + (random(SING_INTERVAL_S / 2, SING_INTERVAL_S * 1.5) * 1000);
   }
 
   delay(MEASURE_INTERVAL_S * 1000);
