@@ -27,15 +27,15 @@ Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-
 | ESP pin      | goes to                                               |
 |:-------------|:------------------------------------------------------|
 | 3V3          | SCD30 VIN, BME280 VIN                                 |
-| 5V           | LED +5V, Servo (+)                                    |
+| 5V           | LED +5V, if you dare: Servo (+)                       |
 | GND          | SCD30 GND, BME280 GND, LED GND, Buzzer (-), Servo (-) |
 | SCL / D1     | SCD30 SCL, BME280 SCL                                 |
 | SDA / D2     | SCD30 SDA, BME280 SDA                                 |
 | GPIO 0 / D3  | LED DIN                                               |
 | GPIO 14 / D5 | Buzzer (+)                                            |
-| GPIO 12 / D6 | Servo PWM                                             |
+| GPIO 12 / D6 | Servo PWM (often brown)                               |
 
-- Connect servo (+) to +5V externally.
+- Connect servo (+)(red) to +5V externally.
 
 
 ### Flashing the ESP using PlatfomIO
