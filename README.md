@@ -36,7 +36,7 @@ Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-
 | GPIO 12 / D6 | Servo PWM (often brown)                               |
 
 ### Flash using the Arduino IDE
-- Open `co2narienvogel.ino` in the Arduino IDE and make sure you can connect to your device  Wemos D1 mini clones often use the CH340 driver)
+- Open `co2narienvogel.ino` in the newest Arduino IDE and make sure you can connect to your device. (Wemos D1 mini clones often use the CH340 driver)
 - Install newest [ESP8266 support](https://www.heise.de/ct/artikel/Arduino-IDE-installieren-und-fit-machen-fuer-ESP8266-und-ESP32-4130814.html) 
 And newest libraries: 
 - [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280_Library)
