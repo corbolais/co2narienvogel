@@ -22,7 +22,6 @@
 // Servo.
 #define SERVO_PIN D6
 #define SERVO_POS_UP 0
-#define SERVO_POS_SING 5
 #define SERVO_POS_DN 60
 #define SERVO_MOVE_TIME_MS 500 // Servo will be switched off after this time.
 
@@ -139,7 +138,6 @@ void singTweet(int intensity, int chirpsNumber) {
  */
 void sing() {
   int seq;
-  moveServo(SERVO_POS_SING, 100);
   for (int i = random(2, 6); i > 0; i--) {
     seq = random(0, 2);
     if (seq == 0) {
@@ -153,7 +151,6 @@ void sing() {
   if (seq == 1 && random(0, 4) >= 1) {
     singTweet(random(2, 6), 3);
   }
-  moveServo(SERVO_POS_UP, 100);
 }
 
 
