@@ -4,18 +4,33 @@
 #include <Servo.h>
 #include <SparkFunBME280.h>
 #include <paulvha_SCD30.h>
+#include <ESP8266WiFi.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <DNSServer.h>
 
 
 // SETUP -----------------------------------------
 
-// LED (always on).
-// - Green: all good (CO2 level < 1000 ppm).
-// - Yellow: warning, open windows (> 1000 ppm).
-// - Red: critical, leave room (> 2000 ppm).
+// CO2 Thresholds (ppm).
+//
+// Recommendation from REHVA (Federation of European Heating, Ventilation and Air Conditioning associations, rehva.eu)
+// for preventing COVID-19 aerosol spread especially in schools:
+// - warn: 800, critical: 1000
+// (https://www.rehva.eu/fileadmin/user_upload/REHVA_COVID-19_guidance_document_V3_03082020.pdf)
+//
+// General air quality recommendation by the German Federal Environmental Agency (2008):
+// - warn: 1000, critical: 2000
+// (https://www.umweltbundesamt.de/sites/default/files/medien/pdfs/kohlendioxid_2008.pdf)
+//
+#define CO2_WARN_PPM 1000
+#define CO2_CRITICAL_PPM 2000
+
+// LED warning light (always on, green / yellow / red).
 #define LED_PIN D3
 #define LED_BRIGHTNESS 255
 
-// Buzzer.
+// Buzzer/Speaker.
 #define BUZZER_PIN D5
 #define SING_INTERVAL_S 10 // Mean sing interval (randomized).
 
@@ -33,18 +48,45 @@
 // Can range from 2 to 1800.
 #define MEASURE_INTERVAL_S 2
 
+// WiFi captive portal showing sensor values.
+// Set to 0 to disable.
+#define WIFI_PORTAL_ENABLED 1
+#define WIFI_AP_NAME "CO2narienvogel"
+
+// How long the graph/log in the WiFi portal should go back, in minutes.
+#define LOG_MINUTES 60
+// Label describing the time axis.
+#define TIME_LABEL "1 Stunde"
+
 // -----------------------------------------------
 
 
+#define GRAPH_W 600
+#define GRAPH_H 260
+#define LOG_SIZE GRAPH_W
+
 SCD30 scd30;
-Adafruit_NeoPixel led = Adafruit_NeoPixel(1, LED_PIN, NEO_GRB + NEO_KHZ800);
 BME280 bme280;
-Servo servo;
 bool bme280isConnected = false;
-uint16_t co2 = 0;
+
 uint16_t pressure = 0;
-bool alarmHasTriggered = false;
+uint16_t co2 = 0;
+uint16_t co2log[LOG_SIZE] = {0}; // Ring buffer.
+uint32_t co2logPos = 0; // Current buffer start position.
+uint16_t co2logDownsample = max(1, ((((LOG_MINUTES) * 60) / MEASURE_INTERVAL_S) / LOG_SIZE));
+uint16_t co2avg, co2avgSamples = 0; // Used for downsampling.
+
 unsigned long nextSingTime, now = 0;
+unsigned long lastMeasureTime = 0;
+bool alarmHasTriggered = false;
+
+Adafruit_NeoPixel led = Adafruit_NeoPixel(1, LED_PIN, NEO_GRB + NEO_KHZ800);
+Servo servo;
+
+AsyncWebServer server(80);
+IPAddress apIP(10, 0, 0, 1);
+IPAddress netMsk(255, 255, 255, 0);
+DNSServer dnsServer;
 
 
 /**
@@ -173,6 +215,65 @@ void siren(uint times) {
 }
 
 
+/**
+ * Handle requests for the captive portal.
+ */
+void handleCaptivePortal(AsyncWebServerRequest *request) {
+  Serial.println("handleCaptivePortal");
+  AsyncResponseStream *response = request->beginResponseStream("text/html");
+
+  response->print("<!DOCTYPE html><html><head>");
+  response->print("<title>CO2narienvogel</title>");
+  response->print(R"(<meta content="width=device-width,initial-scale=1" name="viewport">)");
+  response->printf(R"(<meta http-equiv="refresh" content="%d">)", max(MEASURE_INTERVAL_S, 10));
+  response->print(R"(<style type="text/css">* { font-family:sans-serif }</style>)");
+  response->print("</head><body>");
+
+  // Current measurement.
+  response->printf(R"(<h1><span style="color:%s">&#9679;</span> %d ppm CO<sub>2</sub></h1>)",
+                   co2 > CO2_CRITICAL_PPM ? "red" : co2 > CO2_WARN_PPM ? "yellow" : "green", co2);
+
+  // Generate SVG graph.
+  uint16_t maxVal = CO2_CRITICAL_PPM + (CO2_CRITICAL_PPM - CO2_WARN_PPM);
+  for (uint16_t val : co2log) {
+    if (val > maxVal) {
+      maxVal = val;
+    }
+  }
+  uint w = GRAPH_W, h = GRAPH_H, x, y;
+  uint16_t val;
+  response->printf(R"(<svg width="100%%" height="100%%" viewBox="0 0 %d %d">)", w, h);
+  // Background.
+  response->printf(R"(<rect style="fill:#FFC1B0; stroke:none" x="%d" y="%d" width="%d" height="%d"/>)",
+                   0, 0, w, (int) map(maxVal - CO2_CRITICAL_PPM, 0, maxVal, 0, h));
+  response->printf(R"(<rect style="fill:#FFFCB3; stroke:none" x="%d" y="%d" width="%d" height="%d"/>)",
+                   0, (int) map(maxVal - CO2_CRITICAL_PPM, 0, maxVal, 0, h), w, (int) map(CO2_WARN_PPM, 0, maxVal, 0, h));
+  response->printf(R"(<rect style="fill:#AFF49D; stroke:none" x="%d" y="%d" width="%d" height="%d"/>)",
+                   0, (int) map(maxVal - CO2_WARN_PPM, 0, maxVal, 0, h), w, (int) map(CO2_WARN_PPM, 0, maxVal, 0, h));
+  // Threshold values.
+  response->printf(R"(<text style="color:black; font-size:10px" x="%d" y="%d">> %d ppm</text>)",
+                   4, (int) map(maxVal - CO2_CRITICAL_PPM, 0, maxVal, 0, h) - 6, CO2_CRITICAL_PPM);
+  response->printf(R"(<text style="color:black; font-size:10px" x="%d" y="%d">< %d ppm</text>)",
+                   4, (int) map(maxVal - CO2_WARN_PPM, 0, maxVal, 0, h) + 12, CO2_WARN_PPM);
+  // Plot line.
+  response->print(R"(<path style="fill:none; stroke:black; stroke-width:2px; stroke-linejoin:round" d=")");
+  for (uint32_t i = 0; i < LOG_SIZE; i += (LOG_SIZE / w)) {
+    val = co2log[(co2logPos + i) % LOG_SIZE];
+    x = (int) map(i, 0, LOG_SIZE, 0, w + (w / LOG_SIZE));
+    y = h - (int) map(val, 0, maxVal, 0, h);
+    response->printf("%s%d,%d", i == 0 ? "M" : "L", x, y);
+  }
+  response->print(R"("/>)");
+  response->print("</svg>");
+
+  // Labels.
+  response->printf("<p>%s</p>", TIME_LABEL);
+
+  response->print("</body></html>");
+  request->send(response);
+}
+
+
 void setup() {
   Serial.begin(115200);
   Serial.println("----------------------------");
@@ -217,10 +318,32 @@ void setup() {
 
   // Initialize servo.
   moveServo(SERVO_POS_UP);
+
+  // Initialize WiFi, DNS and web server.
+  if (WIFI_PORTAL_ENABLED) {
+    WiFi.mode(WIFI_AP);
+    WiFi.softAPConfig(apIP, apIP, netMsk);
+    WiFi.softAP(WIFI_AP_NAME);
+    dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+    dnsServer.start(53, "*", apIP);
+    server.on("/", HTTP_GET, handleCaptivePortal);
+    server.onNotFound(handleCaptivePortal);
+    server.begin();
+  }
 }
 
 
 void loop() {
+  // Tasks that need to run continuously.
+  if (WIFI_PORTAL_ENABLED) {
+    dnsServer.processNextRequest();
+  }
+
+  // Early exit.
+  if ((millis() - lastMeasureTime) < (MEASURE_INTERVAL_S * 1000)) {
+    return;
+  }
+
   // Read sensors.
   if (bme280isConnected) {
     pressure = (uint16_t)(bme280.readFloatPressure() / 100);
@@ -230,7 +353,17 @@ void loop() {
     co2 = scd30.getCO2();
   }
 
-  // Log all sensor values.
+  // Average (downsample) and log CO2 values for the graph.
+  co2avg = ((co2avgSamples * co2avg) + co2) / (co2avgSamples + 1);
+  co2avgSamples++;
+  if (co2avgSamples >= co2logDownsample) {
+    co2log[co2logPos] = co2avg;
+    co2logPos++;
+    co2logPos %= LOG_SIZE;
+    co2avg = co2avgSamples = 0;
+  }
+
+  // Print all sensor values.
   Serial.printf(
     "[SCD30]  temp: %.2f°C, humid: %.2f%%, CO2: %dppm\r\n",
     scd30.getTemperature(), scd30.getHumidity(), co2
@@ -244,10 +377,10 @@ void loop() {
   Serial.println("-----------------------------------------------------");
 
   // Update LED.
-  if (co2 < 1000) {
+  if (co2 < CO2_WARN_PPM) {
     led.setPixelColor(0, 0, 255, 0); // Green.
   }
-  else if (co2 < 2000) {
+  else if (co2 < CO2_CRITICAL_PPM) {
     led.setPixelColor(0, 255, 200, 0); // Yellow.
   }
   else {
@@ -256,7 +389,7 @@ void loop() {
   led.show();
 
   // Trigger alarms.
-  if (co2 >= 2000) {
+  if (co2 >= CO2_CRITICAL_PPM) {
     alarmContinuous();
     if (!alarmHasTriggered) {
       alarmOnce();
@@ -270,10 +403,10 @@ void loop() {
 
   // Play sounds.
   now = millis();
-  if (co2 < 1000 && nextSingTime < now) {
+  if (co2 < CO2_WARN_PPM && nextSingTime < now) {
     sing();
     nextSingTime = now + (random(SING_INTERVAL_S / 2, SING_INTERVAL_S * 1.5) * 1000);
   }
 
-  delay(MEASURE_INTERVAL_S * 1000);
+  lastMeasureTime = millis();
 }
