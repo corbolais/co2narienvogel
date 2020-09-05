@@ -2,6 +2,7 @@
 
 The project of the Netzbasteln radio-show #148 is a canary bird that measures CO<sub>2</sub> concentration in room air and warns if levels become critical for Covid-19 infection risk. Just like a canary bird warned miners when "[Evil Weather](https://de.wikipedia.org/wiki/B%C3%B6se_Wetter)" occured.
 
+
 ## Threshold values
 | LED color                 |CO<sub>2</sub> concentration |
 |:--------------------------|:----------------------------|
@@ -35,10 +36,14 @@ Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-
 | GPIO 14 / D5 | Buzzer (+)                                            |
 | GPIO 12 / D6 | Servo PWM (often brown)                               |
 
+
 ### Flash using the Arduino IDE
 - Open `co2narienvogel.ino` in the newest Arduino IDE and make sure you can connect to your device. (Wemos D1 mini clones often use the CH340 driver)
 - Install newest [ESP8266 support](https://www.heise.de/ct/artikel/Arduino-IDE-installieren-und-fit-machen-fuer-ESP8266-und-ESP32-4130814.html) 
-And newest libraries: 
-- [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280_Library)
-- [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
-- [Paulvha_SCD30](https://github.com/paulvha/scd30) (Install via ZIP-Download on Github and Sketch -> Include library -> Add .ZIP) 
+- And newest libraries (using the built-in library manager, *Tools –> Manage Libraries...*): 
+  - [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280_Library)
+  - [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
+- Add external libraries (download ZIP from GitHub, then import in Arduino, *Sketch -> Include library –> Add .ZIP Library...*)
+  - [paulvha SCD30 library](https://github.com/paulvha/scd30) ([.zip](https://github.com/paulvha/scd30/archive/master.zip))
+  - [ESPAsyncTCP](https://github.com/me-no-dev/ESPAsyncTCP) ([.zip](https://github.com/me-no-dev/ESPAsyncTCP/archive/master.zip))
+  - [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer) ([.zip](https://github.com/me-no-dev/ESPAsyncWebServer/archive/master.zip))
