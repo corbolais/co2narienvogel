@@ -40,7 +40,7 @@ Based on [coro2sens](https://github.com/kmetz/coro2sens) and [ideas from Umwelt-
 ### Flash using the Arduino IDE
 - Open `co2narienvogel.ino` in the newest Arduino IDE and make sure you can connect to your device. (Wemos D1 mini clones often use the CH340 driver)
 - Install newest [ESP8266 support](https://www.heise.de/ct/artikel/Arduino-IDE-installieren-und-fit-machen-fuer-ESP8266-und-ESP32-4130814.html) 
-- And newest libraries (using the built-in library manager, *Tools –> Manage Libraries...*): 
+- And newest libraries (using the built-in library manager, *Tools –> Manage Libraries...*)
   - [Adafruit BME280](https://github.com/adafruit/Adafruit_BME280_Library)
   - [Adafruit NeoPixel](https://github.com/adafruit/Adafruit_NeoPixel)
 - Add external libraries (download ZIP from GitHub, then import in Arduino, *Sketch -> Include library –> Add .ZIP Library...*)
